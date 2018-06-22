@@ -1,19 +1,14 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package br.uefs.ecomp.view;
 
-/**
- *
- * @author Eduardo
- */
+//  @author Eduardo
+
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
+
 public class TelaPrincipal extends javax.swing.JFrame {
 
-    /**
-     * Creates new form TelaPrincipal
-     */
+    
     public TelaPrincipal() {
         initComponents();
     }
@@ -33,7 +28,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
         lista = new javax.swing.JTable();
         comprar = new javax.swing.JButton();
         carrinho = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
+        verCarrinho = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("RMI");
@@ -73,6 +68,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        lista.setSelectionBackground(new java.awt.Color(255, 153, 51));
         lista.getTableHeader().setReorderingAllowed(false);
         jScrollPane1.setViewportView(lista);
         if (lista.getColumnModel().getColumnCount() > 0) {
@@ -87,6 +83,11 @@ public class TelaPrincipal extends javax.swing.JFrame {
         comprar.setForeground(new java.awt.Color(255, 255, 255));
         comprar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/carCompra.png"))); // NOI18N
         comprar.setText("Comprar");
+        comprar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                comprarActionPerformed(evt);
+            }
+        });
 
         carrinho.setBackground(new java.awt.Color(255, 102, 0));
         carrinho.setForeground(new java.awt.Color(255, 255, 255));
@@ -98,8 +99,13 @@ public class TelaPrincipal extends javax.swing.JFrame {
             }
         });
 
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/car.png"))); // NOI18N
-        jButton1.setText("(2)");
+        verCarrinho.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/car.png"))); // NOI18N
+        verCarrinho.setText("(2)");
+        verCarrinho.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                verCarrinhoActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -122,7 +128,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
                         .addGap(0, 0, Short.MAX_VALUE))))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton1)
+                .addComponent(verCarrinho)
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -131,7 +137,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton1)
+                .addComponent(verCarrinho)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 184, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -163,9 +169,31 @@ public class TelaPrincipal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void carrinhoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_carrinhoActionPerformed
-        // TODO add your handling code here:
+        DefaultTableModel tabela = (DefaultTableModel) lista.getModel();
+        
+        if (lista.getSelectedRow() == -1) {
+            JOptionPane.showMessageDialog(null, "Porfavor, selecione um produto.", "Atenção!", JOptionPane.WARNING_MESSAGE);
+        }
     }//GEN-LAST:event_carrinhoActionPerformed
 
+    private void verCarrinhoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_verCarrinhoActionPerformed
+        Carrinho carro = new Carrinho(this, true);
+        carro.setVisible(true);
+    }//GEN-LAST:event_verCarrinhoActionPerformed
+
+    private void comprarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comprarActionPerformed
+        DefaultTableModel tabela = (DefaultTableModel) lista.getModel();
+        
+        if (lista.getSelectedRow() == -1) {
+            JOptionPane.showMessageDialog(null, "Porfavor, selecione um produto.", "Atenção!", JOptionPane.WARNING_MESSAGE);
+        }
+    }//GEN-LAST:event_comprarActionPerformed
+
+    public void disableButtons(boolean key){
+        carrinho.setEnabled(key);
+        comprar.setEnabled(key);
+   }
+    
     /**
      * @param args the command line arguments
      */
@@ -204,10 +232,10 @@ public class TelaPrincipal extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton carrinho;
     private javax.swing.JButton comprar;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable lista;
+    private javax.swing.JButton verCarrinho;
     // End of variables declaration//GEN-END:variables
 }
