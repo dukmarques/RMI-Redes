@@ -2,15 +2,24 @@ package br.uefs.ecomp.view;
 
 //  @author Eduardo
 
+import br.uefs.ecomp.model.Produto;
+import br.uefs.ecomp.util.ManipularArquivo;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 
 public class TelaPrincipal extends javax.swing.JFrame {
-
+    private LinkedList<Produto> itens = new LinkedList<>();
+    private LinkedList<Produto> carro = new LinkedList<>();
     
     public TelaPrincipal() {
         initComponents();
+        listarItens();
     }
 
     /**
@@ -29,6 +38,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
         comprar = new javax.swing.JButton();
         carrinho = new javax.swing.JButton();
         verCarrinho = new javax.swing.JButton();
+        atualizar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("RMI");
@@ -100,10 +110,17 @@ public class TelaPrincipal extends javax.swing.JFrame {
         });
 
         verCarrinho.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/car.png"))); // NOI18N
-        verCarrinho.setText("(2)");
+        verCarrinho.setText("(0)");
         verCarrinho.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 verCarrinhoActionPerformed(evt);
+            }
+        });
+
+        atualizar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/refresh.png"))); // NOI18N
+        atualizar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                atualizarActionPerformed(evt);
             }
         });
 
@@ -125,11 +142,12 @@ public class TelaPrincipal extends javax.swing.JFrame {
                         .addGap(22, 22, 22))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(verCarrinho)
-                .addContainerGap())
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addComponent(atualizar, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(verCarrinho, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap())))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -137,7 +155,9 @@ public class TelaPrincipal extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(verCarrinho)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(verCarrinho)
+                    .addComponent(atualizar, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 184, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -173,12 +193,16 @@ public class TelaPrincipal extends javax.swing.JFrame {
         
         if (lista.getSelectedRow() == -1) {
             JOptionPane.showMessageDialog(null, "Porfavor, selecione um produto.", "Atenção!", JOptionPane.WARNING_MESSAGE);
+        }else{
+            carro.add(getItem(lista.getValueAt(lista.getSelectedRow(), 0).toString()));
+            verCarrinho.setText("("+carro.size()+")");
         }
     }//GEN-LAST:event_carrinhoActionPerformed
 
     private void verCarrinhoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_verCarrinhoActionPerformed
-        Carrinho carro = new Carrinho(this, true);
+        Carrinho carro = new Carrinho(this, true, this.carro);
         carro.setVisible(true);
+        verCarrinho.setText("("+this.carro.size()+")");
     }//GEN-LAST:event_verCarrinhoActionPerformed
 
     private void comprarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comprarActionPerformed
@@ -186,9 +210,46 @@ public class TelaPrincipal extends javax.swing.JFrame {
         
         if (lista.getSelectedRow() == -1) {
             JOptionPane.showMessageDialog(null, "Porfavor, selecione um produto.", "Atenção!", JOptionPane.WARNING_MESSAGE);
+        }else{
+            JOptionPane.showMessageDialog(null, "Compra realizada com sucesso! \nProduto Comprado: "+lista.getValueAt(lista.getSelectedRow(), 0), "Sucesso!", JOptionPane.INFORMATION_MESSAGE);
         }
     }//GEN-LAST:event_comprarActionPerformed
 
+    private void atualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_atualizarActionPerformed
+        listarItens();
+    }//GEN-LAST:event_atualizarActionPerformed
+
+    public void listarItens(){
+        try {
+            DefaultTableModel tabela  = (DefaultTableModel) lista.getModel();
+            ManipularArquivo arq = new ManipularArquivo();
+            itens = arq.lerDic();
+            
+            tabela.setRowCount(0);
+            
+            Iterator itr = itens.iterator();
+            while (itr.hasNext()) {
+                Produto p = (Produto) itr.next();
+                tabela.addRow(p.info());
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
+    
+    public Produto getItem(String s){
+        Iterator itr = itens.iterator();
+        while (itr.hasNext()) {
+            Produto p = (Produto) itr.next();
+            if (p.getNome().equals(s)) {
+                return p;
+            }
+        }
+        verCarrinho.setText("("+carro.size()+")");
+        return null;
+    }
+    
     public void disableButtons(boolean key){
         carrinho.setEnabled(key);
         comprar.setEnabled(key);
@@ -230,6 +291,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton atualizar;
     private javax.swing.JButton carrinho;
     private javax.swing.JButton comprar;
     private javax.swing.JLabel jLabel1;

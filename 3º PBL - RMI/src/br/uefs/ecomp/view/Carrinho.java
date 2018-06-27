@@ -1,13 +1,29 @@
 package br.uefs.ecomp.view;
 
+import br.uefs.ecomp.model.Produto;
+import java.util.Iterator;
+import java.util.LinkedList;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 public class Carrinho extends javax.swing.JDialog {
-
+    private LinkedList<Produto> itens;
+    
+    public Carrinho(java.awt.Frame parent, boolean modal, LinkedList<Produto> itens) {
+        super(parent, modal);
+        initComponents();
+        this.itens = itens;
+        
+        if (this.itens.isEmpty()) {
+            disableButtons(false);
+        }else{
+            listarItens();
+        }
+    }
+    
     public Carrinho(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        disableButtons(false);
     }
 
     /**
@@ -27,6 +43,7 @@ public class Carrinho extends javax.swing.JDialog {
         jScrollPane1 = new javax.swing.JScrollPane();
         lista = new javax.swing.JTable();
         aviso = new javax.swing.JLabel();
+        custoTotal = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Carrinho");
@@ -50,13 +67,15 @@ public class Carrinho extends javax.swing.JDialog {
         finalizar.setBackground(new java.awt.Color(0, 153, 0));
         finalizar.setForeground(new java.awt.Color(255, 255, 255));
         finalizar.setText("Finalizar Compra");
+        finalizar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                finalizarActionPerformed(evt);
+            }
+        });
 
         lista.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null}
+
             },
             new String [] {
                 "Produto", "Valor"
@@ -87,6 +106,8 @@ public class Carrinho extends javax.swing.JDialog {
         aviso.setForeground(new java.awt.Color(255, 0, 0));
         aviso.setText("Você não possui nenhum produto no carrinho");
 
+        custoTotal.setText("Total R$: 0.0");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -108,7 +129,10 @@ public class Carrinho extends javax.swing.JDialog {
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(18, 18, 18)
-                        .addComponent(aviso)))
+                        .addComponent(aviso))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(100, 100, 100)
+                        .addComponent(custoTotal)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -122,10 +146,12 @@ public class Carrinho extends javax.swing.JDialog {
                 .addComponent(aviso)
                 .addGap(11, 11, 11)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(custoTotal)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(remover)
-                    .addComponent(finalizar))
+                    .addComponent(finalizar, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addContainerGap())
         );
 
@@ -153,9 +179,58 @@ public class Carrinho extends javax.swing.JDialog {
     private void removerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removerActionPerformed
         if (lista.getSelectedRow() == -1) {
             JOptionPane.showMessageDialog(null, "Porfavor, selecione um produto!", "Atenção!", JOptionPane.WARNING_MESSAGE);
+        }else{
+            Produto p = getItem(lista.getValueAt(lista.getSelectedRow(), 0).toString());
+            
+            Iterator itr = itens.iterator();
+            while (itr.hasNext()) {
+                Produto prd = (Produto) itr.next();
+                if (prd.getNome().equals(p.getNome())) {
+                    itens.remove(prd);
+                    break;
+                }
+            }
+            listarItens();
         }
     }//GEN-LAST:event_removerActionPerformed
 
+    private void finalizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_finalizarActionPerformed
+        JOptionPane.showMessageDialog(null, "Produto(s) comprado com sucesso!", "Sucesso!", JOptionPane.INFORMATION_MESSAGE);
+        itens.clear();
+        listarItens();
+    }//GEN-LAST:event_finalizarActionPerformed
+
+    public void listarItens(){
+        DefaultTableModel tabela = (DefaultTableModel) lista.getModel();
+        tabela.setRowCount(0);
+        float valorTotal = 0;
+        
+        Iterator itr = itens.iterator();
+        while (itr.hasNext()) {
+            Produto p = (Produto) itr.next();
+            valorTotal += p.getValor();
+            tabela.addRow(p.infoCarrinho());
+        }
+        
+        custoTotal.setText("Total R$: "+valorTotal);
+        if (this.itens.size() == 0) {
+            disableButtons(false);
+        }else{
+            disableButtons(true);
+        }
+    }
+    
+    private Produto getItem(String s){
+        Iterator itr = itens.iterator();
+        while (itr.hasNext()) {
+            Produto p = (Produto) itr.next();
+            if (p.getNome().equals(s)) {
+                return p;
+            }
+        }
+        return null;
+    }
+    
     public void disableButtons(boolean key){
         aviso.setVisible(!key);
         remover.setEnabled(key);
@@ -206,6 +281,7 @@ public class Carrinho extends javax.swing.JDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel aviso;
+    private javax.swing.JLabel custoTotal;
     private javax.swing.JButton finalizar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
