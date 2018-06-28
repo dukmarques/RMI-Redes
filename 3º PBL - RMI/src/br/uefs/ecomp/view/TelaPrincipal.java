@@ -207,7 +207,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_AddCarrinhoActionPerformed
 
     private void verCarrinhoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_verCarrinhoActionPerformed
-        Carrinho carro = new Carrinho(this, true, this.carro);
+        Carrinho carro = new Carrinho(this, true, this.c, this.carro, nomeLoja.getText());
         carro.setVisible(true);
         verCarrinho.setText("("+this.carro.size()+")");
         listarItens();

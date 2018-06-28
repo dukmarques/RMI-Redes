@@ -1,5 +1,6 @@
 package br.uefs.ecomp.view;
 
+import br.uefs.ecomp.controller.ClienteController;
 import br.uefs.ecomp.model.Produto;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -7,12 +8,16 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 public class Carrinho extends javax.swing.JDialog {
+    private ClienteController c;
     private LinkedList<Produto> itens;
+    private String nomeLoja;
     
-    public Carrinho(java.awt.Frame parent, boolean modal, LinkedList<Produto> itens) {
+    public Carrinho(java.awt.Frame parent, boolean modal, ClienteController c, LinkedList<Produto> itens, String nomeLoja) {
         super(parent, modal);
         initComponents();
+        this.c = c;
         this.itens = itens;
+        this.nomeLoja = nomeLoja;
         
         if (this.itens.isEmpty()) {
             disableButtons(false);
@@ -78,14 +83,14 @@ public class Carrinho extends javax.swing.JDialog {
 
             },
             new String [] {
-                "Produto", "Valor"
+                "Produto", "Valor", "Serial"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class
+                java.lang.String.class, java.lang.String.class, java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false
+                false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -96,11 +101,14 @@ public class Carrinho extends javax.swing.JDialog {
                 return canEdit [columnIndex];
             }
         });
+        lista.getTableHeader().setReorderingAllowed(false);
         jScrollPane1.setViewportView(lista);
         if (lista.getColumnModel().getColumnCount() > 0) {
             lista.getColumnModel().getColumn(0).setResizable(false);
             lista.getColumnModel().getColumn(1).setResizable(false);
             lista.getColumnModel().getColumn(1).setPreferredWidth(20);
+            lista.getColumnModel().getColumn(2).setResizable(false);
+            lista.getColumnModel().getColumn(2).setPreferredWidth(20);
         }
 
         aviso.setForeground(new java.awt.Color(255, 0, 0));
@@ -115,24 +123,27 @@ public class Carrinho extends javax.swing.JDialog {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(remover)
-                        .addGap(18, 18, 18)
-                        .addComponent(finalizar))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(65, 65, 65)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2)
-                            .addComponent(jLabel1)))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(48, 48, 48)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(18, 18, 18)
-                        .addComponent(aviso))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(100, 100, 100)
-                        .addComponent(custoTotal)))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(remover)
+                                .addGap(18, 18, 18)
+                                .addComponent(finalizar))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(65, 65, 65)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel2)
+                                    .addComponent(jLabel1)))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(18, 18, 18)
+                                .addComponent(aviso))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(100, 100, 100)
+                                .addComponent(custoTotal)))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -195,8 +206,31 @@ public class Carrinho extends javax.swing.JDialog {
     }//GEN-LAST:event_removerActionPerformed
 
     private void finalizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_finalizarActionPerformed
-        JOptionPane.showMessageDialog(null, "Produto(s) comprado com sucesso!", "Sucesso!", JOptionPane.INFORMATION_MESSAGE);
+        LinkedList<Produto> naoComprados = new LinkedList<>();
+        LinkedList<Produto> comprados = new LinkedList<>();
+        
+        Iterator itr = itens.iterator();
+        
+        while (itr.hasNext()) {
+            Produto p = (Produto) itr.next();
+            boolean compra = c.comprarItem(nomeLoja, p.getSerial());
+            
+            if (compra) {
+                comprados.add(p);
+            }else{
+                naoComprados.add(p);
+            }
+        }
         itens.clear();
+        
+        if (!naoComprados.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Esses produtos não foram comprados pois outro cliente o comprou:" + listaProdutos(naoComprados),
+                    "Atenção", JOptionPane.ERROR_MESSAGE);
+        }
+        if (!comprados.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Itens comprados: " + listaProdutos(comprados),
+                    "Sucesso!", JOptionPane.INFORMATION_MESSAGE);
+        }
         listarItens();
     }//GEN-LAST:event_finalizarActionPerformed
 
@@ -209,7 +243,7 @@ public class Carrinho extends javax.swing.JDialog {
         while (itr.hasNext()) {
             Produto p = (Produto) itr.next();
             valorTotal += p.getValor();
-            tabela.addRow(p.infoCarrinho());
+            tabela.addRow(p.info());
         }
         
         custoTotal.setText("Total R$: "+valorTotal);
@@ -229,6 +263,17 @@ public class Carrinho extends javax.swing.JDialog {
             }
         }
         return null;
+    }
+    
+    private String listaProdutos(LinkedList<Produto> produtos){
+        String pdts = "";
+        Iterator itr = produtos.iterator();
+        
+        while (itr.hasNext()) {
+            Produto p = (Produto) itr.next();
+            pdts = pdts+"\n"+p.getNome();
+        }
+        return pdts;
     }
     
     public void disableButtons(boolean key){
@@ -266,6 +311,7 @@ public class Carrinho extends javax.swing.JDialog {
 
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 Carrinho dialog = new Carrinho(new javax.swing.JFrame(), true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {

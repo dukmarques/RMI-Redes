@@ -4,21 +4,24 @@ package br.uefs.ecomp.controller;
 
 import br.uefs.ecomp.model.Produto;
 import br.uefs.ecomp.util.IEcommerce;
-import java.rmi.RemoteException;
+import br.uefs.ecomp.util.ManipularArquivo;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.LinkedList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class ClienteController {
     static LinkedList<Produto> lista = new LinkedList<>();
     static IEcommerce obj = null;
+    private String config;
     Registry registry;
     
     private void registrer(){
         try {
-            registry = LocateRegistry.getRegistry("192.168.25.190",1010);
+            if (config == null) {
+                ManipularArquivo arq = new ManipularArquivo();
+                config = arq.lerArquivo();
+            }
+            registry = LocateRegistry.getRegistry(config,1010);
             obj = (IEcommerce) registry.lookup("Server");
         } catch (Exception e) {
             System.out.println("Erro: " + e.getMessage());

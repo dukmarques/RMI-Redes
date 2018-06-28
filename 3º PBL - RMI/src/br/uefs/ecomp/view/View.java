@@ -10,12 +10,6 @@ public class View {
     public static void main(String[] args) throws IOException {
         ManipularArquivo arq = new ManipularArquivo();
         
-        LinkedList<Produto> lista = arq.lerDic();
-        
-        Iterator itr = lista.iterator();
-        while (itr.hasNext()) {
-            Produto p = (Produto) itr.next();
-            System.out.println(p.toString());
-        }
+        System.out.println(arq.lerArquivo());
     }
 }
