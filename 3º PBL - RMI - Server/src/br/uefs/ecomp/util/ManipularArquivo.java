@@ -10,7 +10,7 @@ import java.util.LinkedList;
 public class ManipularArquivo {
     
     //Classe utilizada para ler o arquivo de texto contendo os produtos a venda.
-    public LinkedList<Produto> lerDic() throws IOException{
+    public static LinkedList<Produto> lerDic() throws IOException{
         BufferedReader read = null;
         
         try {
@@ -31,7 +31,7 @@ public class ManipularArquivo {
         }
     }
     
-    private Produto trataString(String linha){
+    private static Produto trataString(String linha){
         String[] texto = linha.split(";");
         Produto p = new Produto(texto[0], Float.parseFloat(texto[1]), texto[2]);
         return p;
