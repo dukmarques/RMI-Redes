@@ -124,7 +124,7 @@
                   <Table columnCount="3" rowCount="8">
                     <Column editable="false" title="Produto" type="java.lang.String"/>
                     <Column editable="false" title="Valor" type="java.lang.String"/>
-                    <Column editable="false" title="Quantidade" type="java.lang.String"/>
+                    <Column editable="false" title="Serial" type="java.lang.String"/>
                   </Table>
                 </Property>
                 <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">

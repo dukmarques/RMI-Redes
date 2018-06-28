@@ -5,21 +5,28 @@ package br.uefs.ecomp.controller;
 import br.uefs.ecomp.model.Produto;
 import br.uefs.ecomp.util.IEcommerce;
 import br.uefs.ecomp.util.ManipularArquivo;
+import java.io.IOException;
+import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ServerController extends UnicastRemoteObject implements IEcommerce{
-
+    public ServerController() throws RemoteException {
+        super();
+    }
+    
     @Override
     public LinkedList<Produto> getItens() throws RemoteException {
         try{
             System.out.println("Invocação do método da lista de itens por: " + "decidirei isso");
             return ManipularArquivo.lerDic();
-        }catch(Exception ex){
-            System.out.println("Erro: " + ex.getMessage());
+        } catch (IOException ex) {
+            Logger.getLogger(ServerController.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }
@@ -29,9 +36,13 @@ public class ServerController extends UnicastRemoteObject implements IEcommerce{
             ServerController obj = new ServerController();
             System.setProperty("java.rmi.server.hostname", "192.168.25.190");
             Registry registry = LocateRegistry.createRegistry(1010);
-        } catch (Exception ex) {
-            System.out.println("Erro: " + ex.getMessage());
-            ex.printStackTrace();
+            
+            registry.bind("Server", obj);
+            System.out.println("Registrado lista de itens na rede!");
+        } catch (RemoteException ex) {
+            Logger.getLogger(ServerController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (AlreadyBoundException ex) {
+            Logger.getLogger(ServerController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     

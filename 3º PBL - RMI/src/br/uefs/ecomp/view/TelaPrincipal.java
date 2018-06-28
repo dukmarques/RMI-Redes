@@ -2,6 +2,7 @@ package br.uefs.ecomp.view;
 
 //  @author Eduardo
 
+import br.uefs.ecomp.controller.ClienteController;
 import br.uefs.ecomp.model.Produto;
 import br.uefs.ecomp.util.ManipularArquivo;
 import java.io.IOException;
@@ -14,6 +15,7 @@ import javax.swing.table.DefaultTableModel;
 
 
 public class TelaPrincipal extends javax.swing.JFrame {
+    private ClienteController c = new ClienteController();
     private LinkedList<Produto> itens = new LinkedList<>();
     private LinkedList<Produto> carro = new LinkedList<>();
     
@@ -60,7 +62,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
                 {null, null, null}
             },
             new String [] {
-                "Produto", "Valor", "Quantidade"
+                "Produto", "Valor", "Serial"
             }
         ) {
             Class[] types = new Class [] {
@@ -222,8 +224,13 @@ public class TelaPrincipal extends javax.swing.JFrame {
     public void listarItens(){
         try {
             DefaultTableModel tabela  = (DefaultTableModel) lista.getModel();
-            ManipularArquivo arq = new ManipularArquivo();
-            itens = arq.lerDic();
+            
+            itens = c.getItens();
+            
+            if (itens == null) {
+                JOptionPane.showMessageDialog(null, "Não foi possível buscar os produtos", "Erro", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
             
             tabela.setRowCount(0);
             
@@ -232,8 +239,8 @@ public class TelaPrincipal extends javax.swing.JFrame {
                 Produto p = (Produto) itr.next();
                 tabela.addRow(p.info());
             }
-        } catch (IOException ex) {
-            Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception e) {
+            System.out.println("Erro: " + e.getMessage());
         }
         
     }
