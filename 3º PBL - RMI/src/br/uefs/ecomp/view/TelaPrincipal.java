@@ -4,12 +4,8 @@ package br.uefs.ecomp.view;
 
 import br.uefs.ecomp.controller.ClienteController;
 import br.uefs.ecomp.model.Produto;
-import br.uefs.ecomp.util.ManipularArquivo;
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -21,6 +17,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
     
     public TelaPrincipal() {
         initComponents();
+        this.setIconImage(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/carCompra.png")).getImage());
         nomeLoja();
         listarItens();
     }
@@ -45,7 +42,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
         nomeLoja = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("RMI");
+        setTitle("RMI - Ecommerce");
         setResizable(false);
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));

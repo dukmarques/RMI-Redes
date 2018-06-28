@@ -15,6 +15,7 @@ public class Carrinho extends javax.swing.JDialog {
     public Carrinho(java.awt.Frame parent, boolean modal, ClienteController c, LinkedList<Produto> itens, String nomeLoja) {
         super(parent, modal);
         initComponents();
+        this.setIconImage(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/car.png")).getImage());
         this.c = c;
         this.itens = itens;
         this.nomeLoja = nomeLoja;
@@ -51,7 +52,7 @@ public class Carrinho extends javax.swing.JDialog {
         custoTotal = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Carrinho");
+        setTitle("Meu Carrinho");
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -224,7 +225,7 @@ public class Carrinho extends javax.swing.JDialog {
         itens.clear();
         
         if (!naoComprados.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Esses produtos não foram comprados pois outro cliente o comprou:" + listaProdutos(naoComprados),
+            JOptionPane.showMessageDialog(null, "Esse(s) produto(s) não foram comprados pois não estão mais disponiveis:" + listaProdutos(naoComprados),
                     "Atenção", JOptionPane.ERROR_MESSAGE);
         }
         if (!comprados.isEmpty()) {
