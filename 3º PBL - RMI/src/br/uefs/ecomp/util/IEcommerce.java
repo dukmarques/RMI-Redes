@@ -8,5 +8,8 @@ import java.rmi.RemoteException;
 import java.util.LinkedList;
 
 public interface IEcommerce extends Remote{
-    public LinkedList<Produto> getItens() throws RemoteException;
+    
+    public LinkedList<Produto> getItens(String nomeLoja) throws RemoteException;
+    
+    public boolean comprarProduto(String nomeLoja, String serial) throws RemoteException;
 }
