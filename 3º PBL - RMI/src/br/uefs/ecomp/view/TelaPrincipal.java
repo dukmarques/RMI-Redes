@@ -216,13 +216,18 @@ public class TelaPrincipal extends javax.swing.JFrame {
         if (lista.getSelectedRow() == -1) {
             JOptionPane.showMessageDialog(null, "Porfavor, selecione um produto.", "Atenção!", JOptionPane.WARNING_MESSAGE);
         }else{
-            String serial = lista.getValueAt(lista.getSelectedRow(), 2).toString();
+            int compra = JOptionPane.showConfirmDialog(null, "Tem certeza que deseja comprar o produto: " + lista.getValueAt(lista.getSelectedRow(), 0),
+                "Confirmação de compra", JOptionPane.YES_NO_CANCEL_OPTION);
             
-            boolean sucesso = c.comprarItem(nomeLoja.getText(), serial);
-            
-            if (sucesso) {
-                removeItem(serial);
-                JOptionPane.showMessageDialog(null, "Produto comprado com sucesso!", "Compra efetuada!", JOptionPane.INFORMATION_MESSAGE);
+            if (compra == JOptionPane.YES_OPTION) {
+                String serial = lista.getValueAt(lista.getSelectedRow(), 2).toString();
+
+                boolean sucesso = c.comprarItem(nomeLoja.getText(), serial);
+
+                if (sucesso) {
+                    removeItem(serial);
+                    JOptionPane.showMessageDialog(null, "Produto comprado com sucesso!", "Compra efetuada!", JOptionPane.INFORMATION_MESSAGE);
+                }
             }
         }
     }//GEN-LAST:event_comprarActionPerformed

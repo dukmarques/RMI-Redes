@@ -39,7 +39,7 @@ public class ServerController extends UnicastRemoteObject implements IEcommerce{
     }
     
     @Override
-    public LinkedList<Produto> getItens(String nomeLoja) throws RemoteException {
+    synchronized public LinkedList<Produto> getItens(String nomeLoja) throws RemoteException {
         try{
             System.out.println("Invocação do método da lista de itens pela loja: " + nomeLoja);
             if (listaItens == null) {
@@ -55,7 +55,7 @@ public class ServerController extends UnicastRemoteObject implements IEcommerce{
     
 
     @Override
-    public boolean comprarProduto(String nomeLoja, String serial) throws RemoteException {
+    synchronized public boolean comprarProduto(String nomeLoja, String serial) throws RemoteException {
         try{
             System.out.println("Invocação do método de compra pela loja: " + nomeLoja);
             Produto item = getItem(serial);

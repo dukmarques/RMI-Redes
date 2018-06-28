@@ -192,17 +192,22 @@ public class Carrinho extends javax.swing.JDialog {
         if (lista.getSelectedRow() == -1) {
             JOptionPane.showMessageDialog(null, "Porfavor, selecione um produto!", "Atenção!", JOptionPane.WARNING_MESSAGE);
         }else{
-            Produto p = getItem(lista.getValueAt(lista.getSelectedRow(), 0).toString());
+            int remove = JOptionPane.showConfirmDialog(null, "Tem certeza que deseja remover o produto " + lista.getValueAt(lista.getSelectedRow(), 0) + " do carrinho?",
+                    "Confirmação de remoção", JOptionPane.YES_NO_CANCEL_OPTION);
             
-            Iterator itr = itens.iterator();
-            while (itr.hasNext()) {
-                Produto prd = (Produto) itr.next();
-                if (prd.getNome().equals(p.getNome())) {
-                    itens.remove(prd);
-                    break;
+            if (remove == JOptionPane.YES_OPTION) {
+                Produto p = getItem(lista.getValueAt(lista.getSelectedRow(), 0).toString());
+
+                Iterator itr = itens.iterator();
+                while (itr.hasNext()) {
+                    Produto prd = (Produto) itr.next();
+                    if (prd.getNome().equals(p.getNome())) {
+                        itens.remove(prd);
+                        break;
+                    }
                 }
+                listarItens();
             }
-            listarItens();
         }
     }//GEN-LAST:event_removerActionPerformed
 
@@ -210,29 +215,37 @@ public class Carrinho extends javax.swing.JDialog {
         LinkedList<Produto> naoComprados = new LinkedList<>();
         LinkedList<Produto> comprados = new LinkedList<>();
         
-        Iterator itr = itens.iterator();
+        int result = JOptionPane.showConfirmDialog(null, "Tem certeza que deseja comprar os seguintes itens: " + listaProdutos(itens),
+                "Confirmação de compra",JOptionPane.YES_NO_CANCEL_OPTION);
         
-        while (itr.hasNext()) {
-            Produto p = (Produto) itr.next();
-            boolean compra = c.comprarItem(nomeLoja, p.getSerial());
-            
-            if (compra) {
-                comprados.add(p);
-            }else{
-                naoComprados.add(p);
+        if (result == JOptionPane.YES_OPTION) {
+            Iterator itr = itens.iterator();
+
+            while (itr.hasNext()) {
+                Produto p = (Produto) itr.next();
+                boolean compra = c.comprarItem(nomeLoja, p.getSerial());
+
+                if (compra) {
+                    comprados.add(p);
+                }else{
+                    naoComprados.add(p);
+                }
             }
+            itens.clear();
+
+            if (!naoComprados.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Esse(s) produto(s) não foram comprados pois não estão mais disponiveis:" + listaProdutos(naoComprados),
+                        "Atenção", JOptionPane.ERROR_MESSAGE);
+            }
+            if (!comprados.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Itens comprados: " + listaProdutos(comprados),
+                        "Sucesso!", JOptionPane.INFORMATION_MESSAGE);
+            }
+            listarItens();
+        }else{
+            JOptionPane.showMessageDialog(null, "Compra Cancelada! \nProdutos permanecem no carrinho de compras!", 
+                    "Compra Cancelada", JOptionPane.ERROR_MESSAGE);
         }
-        itens.clear();
-        
-        if (!naoComprados.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Esse(s) produto(s) não foram comprados pois não estão mais disponiveis:" + listaProdutos(naoComprados),
-                    "Atenção", JOptionPane.ERROR_MESSAGE);
-        }
-        if (!comprados.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Itens comprados: " + listaProdutos(comprados),
-                    "Sucesso!", JOptionPane.INFORMATION_MESSAGE);
-        }
-        listarItens();
     }//GEN-LAST:event_finalizarActionPerformed
 
     public void listarItens(){
