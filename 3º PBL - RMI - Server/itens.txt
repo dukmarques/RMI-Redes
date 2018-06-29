@@ -1,3 +1,6 @@
 GTX 1080TI;4000.0;VGA1080;Saldao dos Computadores
 I7 9000K;2500.0;PCSI79K;Saldao dos Computadores
 Memoria RAM 16GB;900.0;MRAM16;Saldao dos Computadores
+SSD Kingstom 240GB;260.0;SDKG240;Saldao dos Computadores
+Fonte Corsair 500W;350.0;FCS500;Saldao dos Computadores
+Monitor AOC 24 FHD';500;MAOC24;Saldao dos Computadores

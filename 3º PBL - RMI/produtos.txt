@@ -1,5 +1,3 @@
 Produtos da Loja Saldão dos Computadores
 
 Nome: GTX 1050TI | Preço: 800.0 | Serial: VGA1050
-Nome: GTX 1080TI | Preço: 4000.0 | Serial: VGA1080
-Nome: Memoria RAM 16GB | Preço: 900.0 | Serial: MRAM16
