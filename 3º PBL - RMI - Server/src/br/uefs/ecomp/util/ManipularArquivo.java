@@ -33,7 +33,7 @@ public class ManipularArquivo {
     
     private static Produto trataString(String linha){
         String[] texto = linha.split(";");
-        Produto p = new Produto(texto[0], Float.parseFloat(texto[1]), texto[2]);
+        Produto p = new Produto(texto[0], Float.parseFloat(texto[1]), texto[2], texto[3]);
         return p;
     }
 }

@@ -10,14 +10,16 @@ import javax.swing.table.DefaultTableModel;
 public class Carrinho extends javax.swing.JDialog {
     private ClienteController c;
     private LinkedList<Produto> itens;
+    private LinkedList<Produto> vendidos;
     private String nomeLoja;
     
-    public Carrinho(java.awt.Frame parent, boolean modal, ClienteController c, LinkedList<Produto> itens, String nomeLoja) {
+    public Carrinho(java.awt.Frame parent, boolean modal, ClienteController c, LinkedList<Produto> itens, LinkedList<Produto> vendidos, String nomeLoja) {
         super(parent, modal);
         initComponents();
         this.setIconImage(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/car.png")).getImage());
         this.c = c;
         this.itens = itens;
+        this.vendidos = vendidos;
         this.nomeLoja = nomeLoja;
         
         if (this.itens.isEmpty()) {
@@ -190,9 +192,9 @@ public class Carrinho extends javax.swing.JDialog {
 
     private void removerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removerActionPerformed
         if (lista.getSelectedRow() == -1) {
-            JOptionPane.showMessageDialog(null, "Porfavor, selecione um produto!", "Atenção!", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Porfavor, selecione um produto!", "Atenção!", JOptionPane.WARNING_MESSAGE);
         }else{
-            int remove = JOptionPane.showConfirmDialog(null, "Tem certeza que deseja remover o produto " + lista.getValueAt(lista.getSelectedRow(), 0) + " do carrinho?",
+            int remove = JOptionPane.showConfirmDialog(this, "Tem certeza que deseja remover o produto " + lista.getValueAt(lista.getSelectedRow(), 0) + " do carrinho?",
                     "Confirmação de remoção", JOptionPane.YES_NO_CANCEL_OPTION);
             
             if (remove == JOptionPane.YES_OPTION) {
@@ -215,7 +217,7 @@ public class Carrinho extends javax.swing.JDialog {
         LinkedList<Produto> naoComprados = new LinkedList<>();
         LinkedList<Produto> comprados = new LinkedList<>();
         
-        int result = JOptionPane.showConfirmDialog(null, "Tem certeza que deseja comprar os seguintes itens: " + listaProdutos(itens),
+        int result = JOptionPane.showConfirmDialog(this, "Tem certeza que deseja comprar os seguintes itens: " + listaProdutos(itens),
                 "Confirmação de compra",JOptionPane.YES_NO_CANCEL_OPTION);
         
         if (result == JOptionPane.YES_OPTION) {
@@ -223,9 +225,10 @@ public class Carrinho extends javax.swing.JDialog {
 
             while (itr.hasNext()) {
                 Produto p = (Produto) itr.next();
-                boolean compra = c.comprarItem(nomeLoja, p.getSerial());
+                boolean compra = c.comprarItem(nomeLoja, p.getSerial(), p.getLoja());
 
                 if (compra) {
+                    vendidos.add(p);
                     comprados.add(p);
                 }else{
                     naoComprados.add(p);
@@ -234,16 +237,16 @@ public class Carrinho extends javax.swing.JDialog {
             itens.clear();
 
             if (!naoComprados.isEmpty()) {
-                JOptionPane.showMessageDialog(null, "Esse(s) produto(s) não foram comprados pois não estão mais disponiveis:" + listaProdutos(naoComprados),
+                JOptionPane.showMessageDialog(this, "Esse(s) produto(s) não foram comprados pois não estão mais disponiveis:" + listaProdutos(naoComprados),
                         "Atenção", JOptionPane.ERROR_MESSAGE);
             }
             if (!comprados.isEmpty()) {
-                JOptionPane.showMessageDialog(null, "Itens comprados: " + listaProdutos(comprados),
+                JOptionPane.showMessageDialog(this, "Itens comprados: " + listaProdutos(comprados),
                         "Sucesso!", JOptionPane.INFORMATION_MESSAGE);
             }
             listarItens();
         }else{
-            JOptionPane.showMessageDialog(null, "Compra Cancelada! \nProdutos permanecem no carrinho de compras!", 
+            JOptionPane.showMessageDialog(this, "Compra Cancelada! \nProdutos permanecem no carrinho de compras!", 
                     "Compra Cancelada", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_finalizarActionPerformed

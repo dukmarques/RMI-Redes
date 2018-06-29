@@ -1,3 +1,3 @@
-GTX 1080TI;4000.0;VGA1080
-I7 9000K;2500.0;PCSI79K
-Memoria RAM 16GB;900.0;MRAM16
+GTX 1080TI;4000.0;VGA1080;Saldao dos Computadores
+I7 9000K;2500.0;PCSI79K;Saldao dos Computadores
+Memoria RAM 16GB;900.0;MRAM16;Saldao dos Computadores

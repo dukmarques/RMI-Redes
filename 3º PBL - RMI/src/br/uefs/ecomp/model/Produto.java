@@ -6,11 +6,13 @@ public class Produto implements Serializable{
     private String nome;
     private float valor;
     private String serial;
+    private String loja;
 
-    public Produto(String nome, float valor, String serial) {
+    public Produto(String nome, float valor, String serial, String loja) {
         this.nome = nome;
         this.valor = valor;
         this.serial = serial;
+        this.loja = loja;
     }
 
     public String getNome() {
@@ -37,18 +39,26 @@ public class Produto implements Serializable{
         this.serial = serial;
     }
 
+    public String getLoja() {
+        return loja;
+    }
+
+    public void setLoja(String loja) {
+        this.loja = loja;
+    }
+    
     @Override
     public String toString() {
         return "Produto: " + " Nome: " + nome + ", Valor: " + valor + ", Serial: " + serial;
     }
     
     public String[] info(){
-        String[] s = {nome,""+valor, ""+serial};
+        String[] s = {nome,""+valor, serial, loja};
         return s;
     }
     
-    public String[] infoCarrinho(){
-        String[] s = {nome, ""+valor};
+    public String infoArquivo(){
+        String s = "Nome: " + nome + " | Preço: " + valor + " | Serial: " + serial;
         return s;
     }
 }

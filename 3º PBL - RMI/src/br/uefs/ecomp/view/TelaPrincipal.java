@@ -14,6 +14,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
     private ClienteController c = new ClienteController();
     private LinkedList<Produto> itens = new LinkedList<>();
     private LinkedList<Produto> carro = new LinkedList<>();
+    private LinkedList<Produto> vendidos = new LinkedList<>();
     
     public TelaPrincipal() {
         initComponents();
@@ -54,14 +55,14 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Produto", "Valor", "Serial"
+                "Produto", "Valor", "Serial", "Vendedor"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.String.class
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false
+                false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -79,8 +80,11 @@ public class TelaPrincipal extends javax.swing.JFrame {
             lista.getColumnModel().getColumn(0).setResizable(false);
             lista.getColumnModel().getColumn(0).setPreferredWidth(300);
             lista.getColumnModel().getColumn(1).setResizable(false);
+            lista.getColumnModel().getColumn(1).setPreferredWidth(100);
             lista.getColumnModel().getColumn(2).setResizable(false);
-            lista.getColumnModel().getColumn(2).setPreferredWidth(100);
+            lista.getColumnModel().getColumn(2).setPreferredWidth(130);
+            lista.getColumnModel().getColumn(3).setResizable(false);
+            lista.getColumnModel().getColumn(3).setPreferredWidth(300);
         }
 
         comprar.setBackground(new java.awt.Color(0, 153, 0));
@@ -130,22 +134,22 @@ public class TelaPrincipal extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jScrollPane1)
+                        .addContainerGap())
+                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel1)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addContainerGap(66, Short.MAX_VALUE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(10, 10, 10)
                         .addComponent(AddCarrinho)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(comprar, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(comprar, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(22, 22, 22))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addComponent(atualizar, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(nomeLoja)
-                        .addGap(55, 55, 55)
+                        .addGap(82, 82, 82)
                         .addComponent(verCarrinho, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addContainerGap())))
         );
@@ -194,7 +198,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
         DefaultTableModel tabela = (DefaultTableModel) lista.getModel();
         
         if (lista.getSelectedRow() == -1) {
-            JOptionPane.showMessageDialog(null, "Porfavor, selecione um produto.", "Atenção!", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Porfavor, selecione um produto.", "Atenção!", JOptionPane.WARNING_MESSAGE);
         }else{
             Produto p = getItem(lista.getValueAt(lista.getSelectedRow(), 2).toString());
             carro.add(p); //Adiciona o produto no carrinho;
@@ -204,7 +208,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_AddCarrinhoActionPerformed
 
     private void verCarrinhoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_verCarrinhoActionPerformed
-        Carrinho carro = new Carrinho(this, true, this.c, this.carro, nomeLoja.getText());
+        Carrinho carro = new Carrinho(this, true, this.c, this.carro, this.vendidos, nomeLoja.getText());
         carro.setVisible(true);
         verCarrinho.setText("("+this.carro.size()+")");
         listarItens();
@@ -214,21 +218,25 @@ public class TelaPrincipal extends javax.swing.JFrame {
         DefaultTableModel tabela = (DefaultTableModel) lista.getModel();
         
         if (lista.getSelectedRow() == -1) {
-            JOptionPane.showMessageDialog(null, "Porfavor, selecione um produto.", "Atenção!", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Porfavor, selecione um produto.", "Atenção!", JOptionPane.WARNING_MESSAGE);
         }else{
-            int compra = JOptionPane.showConfirmDialog(null, "Tem certeza que deseja comprar o produto: " + lista.getValueAt(lista.getSelectedRow(), 0),
+            int compra = JOptionPane.showConfirmDialog(this, "Tem certeza que deseja comprar o produto: " + lista.getValueAt(lista.getSelectedRow(), 0),
                 "Confirmação de compra", JOptionPane.YES_NO_CANCEL_OPTION);
             
             if (compra == JOptionPane.YES_OPTION) {
                 String serial = lista.getValueAt(lista.getSelectedRow(), 2).toString();
+                String loja = lista.getValueAt(lista.getSelectedRow(), 3).toString();
 
-                boolean sucesso = c.comprarItem(nomeLoja.getText(), serial);
+                boolean sucesso = c.comprarItem(nomeLoja.getText(), serial, loja);
 
                 if (sucesso) {
                     removeItem(serial);
-                    JOptionPane.showMessageDialog(null, "Produto comprado com sucesso!", "Compra efetuada!", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Produto comprado com sucesso!", "Compra efetuada!", JOptionPane.INFORMATION_MESSAGE);
+                }else{
+                    JOptionPane.showMessageDialog(this, "Não foi possível comprar o produto:\nProduto indisponivel!", "Erro", JOptionPane.ERROR_MESSAGE);
                 }
             }
+            listarItens();
         }
     }//GEN-LAST:event_comprarActionPerformed
 
@@ -243,7 +251,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
             itens = c.getItens(nomeLoja.getText()); //Chama o método do controller responsável por incovar o método remoto do RMI;
             
             if (itens == null) {
-                JOptionPane.showMessageDialog(null, "Não foi possível buscar os produtos", "Erro", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Não foi possível buscar os produtos", "Erro", JOptionPane.ERROR_MESSAGE);
                 disableButtons(false);
                 return;
             }
@@ -254,12 +262,11 @@ public class TelaPrincipal extends javax.swing.JFrame {
             while (itr.hasNext()) {
                 Produto p = (Produto) itr.next();
                 
-                if (!getCarrinho(p.getSerial())) {
+                if (!getCarrinho(p.getSerial()) && !getVendidos(p.getSerial())) {
                     tabela.addRow(p.info());
                 }
             }
         } catch (Exception e) {
-            System.out.println("Erro: " + e.getMessage());
         }
         
     }
@@ -267,7 +274,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
     private void nomeLoja(){
         String s;
         do {
-            s = JOptionPane.showInputDialog(null, "Digite o nome da Loja", "Nome da Loja", JOptionPane.QUESTION_MESSAGE);
+            s = JOptionPane.showInputDialog(this, "Digite o nome da Loja", "Nome da Loja", JOptionPane.QUESTION_MESSAGE);
                 
         } while (s.trim().length() == 0 || s.equals(""));
         nomeLoja.setText(s);
@@ -297,9 +304,22 @@ public class TelaPrincipal extends javax.swing.JFrame {
         return false;
     }
     
+    private boolean getVendidos(String serial){
+        Iterator itr = vendidos.iterator();
+        
+        while (itr.hasNext()) {
+            Produto v = (Produto) itr.next();
+            if (v.getSerial().equals(serial)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     private void removeItem(String serial){
         Produto p = getItem(serial);
         
+        vendidos.add(p);
         itens.remove(p); //Remove o item da lista de Itens;
         listarItens();
     }
