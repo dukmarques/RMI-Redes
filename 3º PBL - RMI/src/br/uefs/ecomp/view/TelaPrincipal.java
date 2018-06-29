@@ -11,10 +11,10 @@ import javax.swing.table.DefaultTableModel;
 
 
 public class TelaPrincipal extends javax.swing.JFrame {
-    private ClienteController c = new ClienteController();
-    private LinkedList<Produto> itens = new LinkedList<>();
-    private LinkedList<Produto> carro = new LinkedList<>();
-    private LinkedList<Produto> vendidos = new LinkedList<>();
+    private ClienteController c = new ClienteController(); //Controller;
+    private LinkedList<Produto> itens = new LinkedList<>(); //Lista de produtos das lojas;
+    private LinkedList<Produto> carro = new LinkedList<>(); //Lista de produtos no carrinho;
+    private LinkedList<Produto> vendidos = new LinkedList<>(); //Lista de produtos vendidos;
     
     public TelaPrincipal() {
         initComponents();
@@ -194,12 +194,14 @@ public class TelaPrincipal extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    //Método que adiciona item no carrinho
     private void AddCarrinhoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AddCarrinhoActionPerformed
         DefaultTableModel tabela = (DefaultTableModel) lista.getModel();
         
         if (lista.getSelectedRow() == -1) {
             JOptionPane.showMessageDialog(this, "Porfavor, selecione um produto.", "Atenção!", JOptionPane.WARNING_MESSAGE);
         }else{
+            //Pega a string referente ao número de serie do produto e utiliza a função getItem que retorna o produto através do serial;
             Produto p = getItem(lista.getValueAt(lista.getSelectedRow(), 2).toString());
             carro.add(p); //Adiciona o produto no carrinho;
             verCarrinho.setText("("+carro.size()+")"); //Atualiza a quantidade de itens no carrinho;
@@ -207,11 +209,12 @@ public class TelaPrincipal extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_AddCarrinhoActionPerformed
 
+    //Método que instancia a interface do carrinho passando o controller e as listas de carrinho e vendidos e o nome da loja;
     private void verCarrinhoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_verCarrinhoActionPerformed
         Carrinho carro = new Carrinho(this, true, this.c, this.carro, this.vendidos, nomeLoja.getText());
         carro.setVisible(true);
-        verCarrinho.setText("("+this.carro.size()+")");
-        listarItens();
+        verCarrinho.setText("("+this.carro.size()+")"); //Atualiza a quantidade de itens no carrinho;
+        listarItens(); //Atualiza a lista de itens disponíveis para compra/add carrinho;
     }//GEN-LAST:event_verCarrinhoActionPerformed
 
     private void comprarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comprarActionPerformed
@@ -220,48 +223,57 @@ public class TelaPrincipal extends javax.swing.JFrame {
         if (lista.getSelectedRow() == -1) {
             JOptionPane.showMessageDialog(this, "Porfavor, selecione um produto.", "Atenção!", JOptionPane.WARNING_MESSAGE);
         }else{
+            //Mensagem de segurança para confirmação de compra;
             int compra = JOptionPane.showConfirmDialog(this, "Tem certeza que deseja comprar o produto: " + lista.getValueAt(lista.getSelectedRow(), 0),
                 "Confirmação de compra", JOptionPane.YES_NO_CANCEL_OPTION);
             
+            //Verifica se a resposta da mensagem de segurança foi positiva;
             if (compra == JOptionPane.YES_OPTION) {
-                String serial = lista.getValueAt(lista.getSelectedRow(), 2).toString();
-                String loja = lista.getValueAt(lista.getSelectedRow(), 3).toString();
+                String serial = lista.getValueAt(lista.getSelectedRow(), 2).toString(); //Obtem o número de serie do produto selecionado;
+                String loja = lista.getValueAt(lista.getSelectedRow(), 3).toString(); //Obtem o nome da Loja do produto que foi selecionado;
 
+                //Envia para o controller o número de serie, o nome do site e o nome da loja ao qual o produto pertence;
                 boolean sucesso = c.comprarItem(nomeLoja.getText(), serial, loja);
 
                 if (sucesso) {
-                    removeItem(serial);
+                    removeItem(serial); //Caso a compra seja bem sucedida o produto é removido da lista de produto;
                     JOptionPane.showMessageDialog(this, "Produto comprado com sucesso!", "Compra efetuada!", JOptionPane.INFORMATION_MESSAGE);
                 }else{
+                    //Caso contrário é exibido uma mensagem de alerta para o usuário;
                     JOptionPane.showMessageDialog(this, "Não foi possível comprar o produto:\nProduto indisponivel!", "Erro", JOptionPane.ERROR_MESSAGE);
                 }
             }
-            listarItens();
+            listarItens(); //Atualiza a lista de itens disponíveis para compra/add carrinho;
         }
     }//GEN-LAST:event_comprarActionPerformed
 
+    //Método utilizado para atualizar a lista de itens a venda;
     private void atualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_atualizarActionPerformed
         listarItens();
     }//GEN-LAST:event_atualizarActionPerformed
 
+    //Método responsável por pegar os itens a venda através do controller;
     public void listarItens(){
         try {
             DefaultTableModel tabela  = (DefaultTableModel) lista.getModel();
             
             itens = c.getItens(nomeLoja.getText()); //Chama o método do controller responsável por incovar o método remoto do RMI;
             
+            //Caso não seja possível se conectar com o servidor;
             if (itens == null) {
                 JOptionPane.showMessageDialog(this, "Não foi possível buscar os produtos", "Erro", JOptionPane.ERROR_MESSAGE);
-                disableButtons(false);
+                disableButtons(false); //Método utilizado para desativar/ativar os botões;
                 return;
             }
-            disableButtons(true);
-            tabela.setRowCount(0);
+            disableButtons(true); //Ativa os botões;
+            tabela.setRowCount(0); //Zera a quantidade de itens na tabela;
             
+            //Iterador que percorre a lista de produtos e adiona-os na tabela da interface;
             Iterator itr = itens.iterator();
             while (itr.hasNext()) {
                 Produto p = (Produto) itr.next();
                 
+                //Verifica se o produto está na lista de carrinho ou já foi vendido, caso falhe em alguma dessas verificações o produto não entra na tabela;
                 if (!getCarrinho(p.getSerial()) && !getVendidos(p.getSerial())) {
                     tabela.addRow(p.info());
                 }
@@ -271,6 +283,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
         
     }
     
+    //Método utilizado para definir o nome da loja;
     private void nomeLoja(){
         String s;
         do {
@@ -280,6 +293,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
         nomeLoja.setText(s);
     }
     
+    //Método utilizado para buscar um produto através do número de serie;
     public Produto getItem(String serial){
         Iterator itr = itens.iterator();
         while (itr.hasNext()) {
@@ -292,6 +306,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
         return null;
     }
     
+    //Método utilizado para buscar um produto no carrinho através do número de série;
     public boolean getCarrinho(String serial){
         Iterator itr = carro.iterator();
         
@@ -304,6 +319,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
         return false;
     }
     
+    //Método utilizado para buscar um produto na lista de produtos vendidos através do número de serie;
     private boolean getVendidos(String serial){
         Iterator itr = vendidos.iterator();
         
@@ -316,6 +332,8 @@ public class TelaPrincipal extends javax.swing.JFrame {
         return false;
     }
     
+    //Método utilizado para remover o item que já foi vendido ou está indisponível da lista de produtos;
+    //Utilizando o número de série;
     private void removeItem(String serial){
         Produto p = getItem(serial);
         
@@ -323,11 +341,13 @@ public class TelaPrincipal extends javax.swing.JFrame {
         itens.remove(p); //Remove o item da lista de Itens;
         listarItens();
     }
+    //Remove o item utilizando a prória instancia do produto;
     private void removeItem(Produto p){
         itens.remove(p);
         listarItens();
     }
     
+    //Método que desativa/ativa os bottões da tela principal;
     public void disableButtons(boolean key){
         AddCarrinho.setEnabled(key);
         comprar.setEnabled(key);

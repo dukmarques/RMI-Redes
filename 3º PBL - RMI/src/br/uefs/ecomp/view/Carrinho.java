@@ -8,10 +8,10 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 public class Carrinho extends javax.swing.JDialog {
-    private ClienteController c;
-    private LinkedList<Produto> itens;
-    private LinkedList<Produto> vendidos;
-    private String nomeLoja;
+    private ClienteController c; //Controller;
+    private LinkedList<Produto> itens; //Lista de itens no carrinho;
+    private LinkedList<Produto> vendidos; //Lista de itens vendidos;
+    private String nomeLoja; //Nome do site;
     
     public Carrinho(java.awt.Frame parent, boolean modal, ClienteController c, LinkedList<Produto> itens, LinkedList<Produto> vendidos, String nomeLoja) {
         super(parent, modal);
@@ -190,16 +190,20 @@ public class Carrinho extends javax.swing.JDialog {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    //Método utilizado para remover um item do carrinho;
     private void removerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removerActionPerformed
         if (lista.getSelectedRow() == -1) {
             JOptionPane.showMessageDialog(this, "Porfavor, selecione um produto!", "Atenção!", JOptionPane.WARNING_MESSAGE);
         }else{
+            //Mensagem de segurança para confirmação de remoção;
             int remove = JOptionPane.showConfirmDialog(this, "Tem certeza que deseja remover o produto " + lista.getValueAt(lista.getSelectedRow(), 0) + " do carrinho?",
                     "Confirmação de remoção", JOptionPane.YES_NO_CANCEL_OPTION);
             
+            //Verifica se a resposta da mensagem de segurança é positiva;
             if (remove == JOptionPane.YES_OPTION) {
-                Produto p = getItem(lista.getValueAt(lista.getSelectedRow(), 0).toString());
+                Produto p = getItem(lista.getValueAt(lista.getSelectedRow(), 0).toString()); //Obtem o produto;
 
+                //Iterador que percorre a lista buscando o produto e remove-o;
                 Iterator itr = itens.iterator();
                 while (itr.hasNext()) {
                     Produto prd = (Produto) itr.next();
@@ -208,53 +212,62 @@ public class Carrinho extends javax.swing.JDialog {
                         break;
                     }
                 }
-                listarItens();
+                listarItens(); //Atualiza a lista de itens no carrinho;
             }
         }
     }//GEN-LAST:event_removerActionPerformed
 
+    //Método responsável por comprar todos os itens listados no carrinho;
     private void finalizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_finalizarActionPerformed
-        LinkedList<Produto> naoComprados = new LinkedList<>();
-        LinkedList<Produto> comprados = new LinkedList<>();
+        LinkedList<Produto> naoComprados = new LinkedList<>(); //Lista de itens que a compra não foi efetuada com sucesso;
+        LinkedList<Produto> comprados = new LinkedList<>(); //Lista de itens que a compra foi efetuada com sucesso;
         
+        //Mensagem de segurança para confirmação da compra dos produtos;
         int result = JOptionPane.showConfirmDialog(this, "Tem certeza que deseja comprar os seguintes itens: " + listaProdutos(itens),
                 "Confirmação de compra",JOptionPane.YES_NO_CANCEL_OPTION);
         
         if (result == JOptionPane.YES_OPTION) {
             Iterator itr = itens.iterator();
 
+            //Iterador que obtem cada item do carrinho e efetua a compra;
             while (itr.hasNext()) {
                 Produto p = (Produto) itr.next();
-                boolean compra = c.comprarItem(nomeLoja, p.getSerial(), p.getLoja());
+                boolean compra = c.comprarItem(nomeLoja, p.getSerial(), p.getLoja()); //Realiza a compra do item através do controller;
 
                 if (compra) {
+                    //Se a compra foi bem sucedida insere o produto comprado na lista de vendidos e comprados;
                     vendidos.add(p);
                     comprados.add(p);
                 }else{
+                    //Caso contrário insere o produto na lista de não comprados;
                     naoComprados.add(p);
                 }
             }
-            itens.clear();
+            itens.clear(); //Limpa a lista de produtos no carrinho;
 
             if (!naoComprados.isEmpty()) {
+                //Mensagem de erro para os produtos que não foram comprados;
                 JOptionPane.showMessageDialog(this, "Esse(s) produto(s) não foram comprados pois não estão mais disponiveis:" + listaProdutos(naoComprados),
                         "Atenção", JOptionPane.ERROR_MESSAGE);
             }
             if (!comprados.isEmpty()) {
+                //Mensagem de erro para os produtos que a compra foi realizada com sucesso;
                 JOptionPane.showMessageDialog(this, "Itens comprados: " + listaProdutos(comprados),
                         "Sucesso!", JOptionPane.INFORMATION_MESSAGE);
             }
-            listarItens();
+            listarItens(); //Atualiza os itens na lista de carrinho;
         }else{
+            //Caso o usuário cancele a compra dos produtos é apresentado uma mensagem de alerta;
             JOptionPane.showMessageDialog(this, "Compra Cancelada! \nProdutos permanecem no carrinho de compras!", 
                     "Compra Cancelada", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_finalizarActionPerformed
 
+    //Método responsável por listar os itens presentes no carrinho na interface;
     public void listarItens(){
         DefaultTableModel tabela = (DefaultTableModel) lista.getModel();
         tabela.setRowCount(0);
-        float valorTotal = 0;
+        float valorTotal = 0; //Guarda o valor total de todos os produtos no carrinho;
         
         Iterator itr = itens.iterator();
         while (itr.hasNext()) {
@@ -263,14 +276,17 @@ public class Carrinho extends javax.swing.JDialog {
             tabela.addRow(p.info());
         }
         
-        custoTotal.setText("Total R$: "+valorTotal);
+        custoTotal.setText("Total R$: "+valorTotal); //Seta o valor de todos os produtos no carirnho;
+        //Se a lista de produtos no carrinho for 0, os botões são desativados;
         if (this.itens.size() == 0) {
             disableButtons(false);
         }else{
+            //caso contrário são ativados;
             disableButtons(true);
         }
     }
     
+    //Obtem um produto da lista de carrinho;
     private Produto getItem(String s){
         Iterator itr = itens.iterator();
         while (itr.hasNext()) {
@@ -282,6 +298,7 @@ public class Carrinho extends javax.swing.JDialog {
         return null;
     }
     
+    //Método utilizado para listar os produtos nas mensagens de segurança e confirmação;
     private String listaProdutos(LinkedList<Produto> produtos){
         String pdts = "";
         Iterator itr = produtos.iterator();
@@ -293,6 +310,7 @@ public class Carrinho extends javax.swing.JDialog {
         return pdts;
     }
     
+    //Método utilizado para ativar/desativar os botões da interface do carrinho;
     public void disableButtons(boolean key){
         aviso.setVisible(!key);
         remover.setEnabled(key);

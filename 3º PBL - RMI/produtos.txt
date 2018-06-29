@@ -1,3 +1,5 @@
 Produtos da Loja Saldão dos Computadores
 
 Nome: GTX 1050TI | Preço: 800.0 | Serial: VGA1050
+Nome: Memoria RAM 16GB | Preço: 900.0 | Serial: MRAM16
+Nome: Fonte Corsair 500W | Preço: 350.0 | Serial: FCS500

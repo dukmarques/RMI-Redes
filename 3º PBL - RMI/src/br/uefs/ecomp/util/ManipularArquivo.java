@@ -67,6 +67,7 @@ public class ManipularArquivo {
         }
     }
     
+    //Método responsável por tratar as strings obitidas pelo arquivo e instanciar um produto;
     private static Produto trataString(String linha){
         String[] texto = linha.split(";");
         Produto p = new Produto(texto[0], Float.parseFloat(texto[1]), texto[2], texto[3]);

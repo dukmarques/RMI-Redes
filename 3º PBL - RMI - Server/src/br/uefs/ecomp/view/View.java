@@ -10,6 +10,7 @@ public class View {
     public static void main(String[] args) throws RemoteException {
         ServerController c = new ServerController();
         
+        //Registra os métodos remotos na rede RMI;
         c.registrarMetodos();
     }
 }
